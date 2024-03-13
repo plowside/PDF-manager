@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Records - Search</title>
+	<style>
+		body {
+			background-color: #121212;
+			color: #fff;
+			font-family: Arial, sans-serif;
+			margin: 0;
+			padding: 0;
+		}
+
+		.nav-links {
+			background-color: #333;
+			padding: 10px 0;
+			text-align: center;
+		}
+		.nav-links a {
+			color: #fff;
+			text-decoration: none;
+			margin: 0 10px;
+			padding: 5px 10px;
+			border-radius: 5px;
+			transition: background-color 0.3s ease;
+		}
+		.nav-links a:hover {
+			background-color: #555;
+		}
+		.nav-link {
+			position: absolute;
+			top: 5px;
+			right: 10px;
+			background-color: #222;
+		}
+		.current_url {
+			background-color: #555;
+		}
+
+		.container {
+			max-width: 800px;
+			margin: 0 auto;
+			padding: 20px;
+		}
+
+		.filters {
+			margin-bottom: 20px;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 20px;
+		}
+		.filter-group {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+		}
+		.filter-label {
+			color: #fff;
+			margin-bottom: 5px;
+		}
+		.filter-input {
+			background-color: #333;
+			color: #fff;
+			padding: 8px;
+			border: none;
+			outline: none;
+			margin-bottom: 10px;
+			border-radius: 10px;
+		}
+
+		.date-change {
+			background-color: #282828;
+			color: #fff;
+			padding: 8px 16px;
+			border: none;
+			cursor: pointer;
+			border-radius: 10px;
+			transition: background-color 0.2s;
+		}
+		.date-change:hover {
+			background-color: #303030;
+		}
+		.date-change:active {
+			background-color: #383838;
+		}
+
+		.button-search, .button-comparasion, .button-search-all {
+			background-color: #282828;
+			color: #fff;
+			padding: 8px 16px;
+			border: none;
+			cursor: pointer;
+			border-radius: 10px;
+			transition: background-color 0.2s;
+		}
+		.button-search:hover, .button-search-all:hover, .button-comparasion:hover {
+			background-color: #303030;
+		}
+		.button-search:active, .button-search-all:active, .button-comparasion:active {
+			background-color: #383838;
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			background-color: #333;
+			color: #fff;
+			border-radius: 10px;
+			overflow: auto;
+			max-height: 200px;
+		}
+		tbody {
+			display: block;
+		}
+		thead,
+		tbody tr {
+			display: table;
+			width: 100%;
+			table-layout: fixed;
+		}
+		tbody {
+			overflow-y: auto;
+		}
+		th,
+		td {
+			padding: 10px;
+			border-bottom: 1px solid #444;
+			text-align: center;
+			width: 100%;
+		}
+		th {
+			background-color: #282828;
+		}
+
+		.download-button {
+			background-color: #505050;
+			color: #fff;
+			padding: 8px 16px;
+			border: none;
+			cursor: pointer;
+			border-radius: 10px;
+		}
+		.download-button:hover {
+			background-color: #606060;
+		}
+
+		::-webkit-scrollbar {
+			width: 7px;
+			background-color: #333;
+			border-radius: 10px;
+		}
+		::-webkit-scrollbar-thumb {
+			-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+			background-color: rgba(219, 219, 219, 0.3);
+			border-radius: 10px;
+		}
+
+
+		/* Modal box */
+		.modal {
+			display: none;
+			position: fixed;
+			z-index: 1;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			overflow: auto;
+			background-color: rgba(0, 0, 0, 0.5);
+		}
+		.modal-content {
+			background-color: #333;
+			margin: 5% auto;
+			padding: 20px;
+			border: 1px solid #888;
+			width: 80%;
+			border-radius: 10px;
+			color: #fff;
+		}
+		.modal-content h2 {
+			margin-bottom: 60px;
+			text-align: center;
+		}
+		.modal-content label {
+			display: block;
+			margin-bottom: 10px;
+		}
+		.modal-content input {
+			background-color: #333;
+			color: #fff;
+			padding: 10px;
+			margin-bottom: 10px;
+			border-radius: 10px;
+			width: calc(100% - 20px);
+		}
+		.modal-content button {
+			background-color: #181818;
+			color: #fff;
+			padding: 8px 16px;
+			border: none;
+			cursor: pointer;
+			border-radius: 10px;
+			transition: background-color 0.2s;
+		}
+		.modal-content button:hover {
+			background-color: #202020;
+		}
+		.modal-content button:active {
+			background-color: #282828;
+		}
+
+
+		.modal-group {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+		}
+		.modal-label {
+			color: #fff;
+			margin-bottom: 5px;
+		}
+		.modal-textarea {
+			background-color: #111;
+			color: #fff;
+			padding: 8px;
+			border: none;
+			outline: none;
+			margin-bottom: 10px;
+			border-radius: 10px;
+		}
+
+		.close {
+			color: #aaa;
+			float: right;
+			font-size: 28px;
+			font-weight: bold;
+		}
+		.close:hover,
+		.close:focus {
+			color: #fff;
+			text-decoration: none;
+			cursor: pointer;
+		}
+	</style>
+</head>
+<body>
+	<div class="nav-links">
+		<a href="/records/edit" class="current_url">Edit</a>
+		<a href="/records/search">Search</a>
+		<a href="/records/add">Add</a>
+		<a href="/logout" class="nav-link">Logout</a>
+	</div>
+	<div class="container">
+		<div class="filters">
+			<div class="filter-group">
+				<label for="field1" class="filter-label">Thing 1</label>
+				<input type="text" id="field1" class="filter-input">
+			</div>
+			<div class="filter-group">
+				<label for="field2" class="filter-label">Thing 2</label>
+				<input type="text" id="field2" class="filter-input">
+			</div>
+			<div class="filter-group">
+				<label for="field3" class="filter-label">Thing 3</label>
+				<input type="text" id="field3" class="filter-input">
+			</div>
+			<div class="filter-group">
+				<label for="field4" class="filter-label">Thing 4</label>
+				<input type="text" id="field4" class="filter-input">
+			</div>
+			<div class="filter-group">
+				<label for="field5" class="filter-label">Thing 5</label>
+				<input type="text" id="field5" class="filter-input">
+			</div>
+			<div class="filter-group">
+				<label for="field6" class="filter-label">Thing 6</label>
+				<input type="text" id="field6" class="filter-input">
+			</div>
+			<div class="filter-group">
+				<label for="field7" class="filter-label">Thing 7</label>
+				<input type="text" id="field7" class="filter-input">
+			</div>
+			<div class="filter-group">
+				<label for="field8" class="filter-label">Date</label>
+				<input type="date" id="field8" class="filter-input">
+				<button class="date-change" onclick="changeDate()">Disable</button>
+			</div>
+			<button class="button-search" onclick="sendFilters()">Search</button>
+			<button class="button-comparasion" onclick="changeComparasion()" state=true>Full comparasion: Enabled</button>
+			<br><br>
+			<button class="button-search-all" onclick="getAllRecords()" state=true>Get all records</button>
+		</div>
+	</div>
+	<div id="results"></div>
+
+	<!-- Modal box for record's editing and deleting -->
+	<div id="editModal" class="modal">
+		<div class="modal-content">
+			<span class="close">&times;</span>
+			<h2>Edit Record</h2>
+			<div id="editForm"></div>
+			<button id="deleteBtn" class="delete-button">Delete</button>
+			<button id="saveBtn" class="save-button">Save changes</button>
+		</div>
+	</div>
+
+	<script>
+		document.getElementById('field8').valueAsDate = new Date();
+		function changeComparasion() {
+			element = document.querySelector('.button-comparasion');
+			console.log(element.attributes.state);
+
+			if (element.getAttribute('state') == 'true') {
+				element.setAttribute('state', false);
+				element.textContent = 'Full comparasion: Disabled';
+			} else {
+				element.setAttribute('state', true);
+				element.textContent = 'Full comparasion: Enabled';
+			}
+		}
+
+		function changeDate() {
+			element = document.querySelector('.date-change').previousElementSibling;
+			if (element.disabled == true) {
+				element.disabled = false;
+				element.nextElementSibling.textContent = 'Disable';
+			} else {
+				element.disabled = true;
+				element.nextElementSibling.textContent = 'Enable';
+			}
+		}
+
+		function sendFilters() {
+			var filters = { 'fields': {} , 'full_comparasion': document.querySelector('.button-comparasion').getAttribute('state') == 'true'};
+			document.querySelectorAll('.filter-input').forEach(function(input) {
+				if (input.disabled == false) {
+					if (input.id == 'field8'){
+						filters['fields'][input.previousElementSibling.textContent] = input.value.split('-').reverse().join('.');
+					} else {
+						filters['fields'][input.previousElementSibling.textContent] = input.value;
+					}
+				}
+			});
+
+			var xhr = new XMLHttpRequest();
+			xhr.open('POST', window.location.origin + '/api/filter', true);
+			xhr.setRequestHeader('Content-Type', 'application/json');
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState === XMLHttpRequest.DONE) {
+					if (xhr.status === 200) {
+						displayResults(JSON.parse(xhr.responseText));
+					} else {
+						console.error('Error:', xhr.status);
+					}
+				}
+			};
+			xhr.send(JSON.stringify(filters));
+		}
+
+		function getAllRecords() {
+			var xhr = new XMLHttpRequest();
+			xhr.open('POST', window.location.origin + '/api/filter', true);
+			xhr.setRequestHeader('Content-Type', 'application/json');
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState === XMLHttpRequest.DONE) {
+					if (xhr.status === 200) {
+						displayResults(JSON.parse(xhr.responseText));
+					} else {
+						console.error('Error:', xhr.status);
+					}
+				}
+			};
+			xhr.send(JSON.stringify({'all_records': true}));
+		}
+
+		function displayResults(results) {
+			var resultsDiv = document.getElementById('results');
+			resultsDiv.innerHTML = '';
+
+			var table = document.createElement('table')
+			var thead = document.createElement('thead');
+			var tbody = document.createElement('tbody');
+
+			var headerRow = document.createElement('tr');
+			var headers = ['Edit', 'Download'];
+			document.querySelectorAll('.filter-input').forEach(function(input) {
+				headers.push(input.previousElementSibling.textContent.trim());
+			});
+
+			var i = 0;
+			var headerNames = [];
+			headers.forEach(function(headerText) {
+				var header = document.createElement('th');
+				header.textContent = headerText;
+				header.setAttribute('fieldname', 'field' + i);
+				headerNames.push('field' + i);
+				headerRow.appendChild(header);
+				i++;
+			});
+
+			thead.appendChild(headerRow);
+			table.appendChild(thead);
+
+
+			results.forEach(function(result) {
+				var record_id = result['id'];
+				var result_file_url = result['file_url'];
+
+				delete result['id'];
+				delete result['file_url'];
+
+				var row = document.createElement('tr');
+				var editCell = document.createElement('td');
+				var editButton = document.createElement('button');
+				editButton.classList.add('download-button');
+				editButton.textContent = 'Edit';
+				editButton.onclick = function() {
+					openEditModal(record_id, result);
+				};
+				editCell.appendChild(editButton);
+				row.appendChild(editCell);
+
+				headerNames.forEach(function(header) {
+					var cell = document.createElement('td');
+					if (header == 'field0'){
+						var downloadButton = document.createElement('button');
+						downloadButton.classList.add('download-button');
+						downloadButton.textContent = 'Download';
+						if (result_file_url.startsWith('http') == true){
+							downloadButton.setAttribute("onclick", "window.open('" + result_file_url +
+						 "', '_blank')");
+						} else {
+							downloadButton.setAttribute("onclick", "window.open('" + window.location.
+						origin + "/" + result_file_url + "', '_blank')");
+						}
+						cell.appendChild(downloadButton);
+					} else {
+						cell.textContent = result[header];
+					}
+					row.appendChild(cell);
+				});
+				tbody.appendChild(row);
+			});
+			table.appendChild(tbody);
+			resultsDiv.appendChild(table);
+		}
+
+
+
+		// Modal box
+		var modal = document.getElementById("editModal");
+		var span = document.getElementsByClassName("close")[0];
+		span.onclick = function() {
+			modal.style.display = "none";
+		}
+		window.onclick = function(event) {
+			if (event.target == modal) {
+				modal.style.display = "none";
+			}
+		}
+		var deleteBtn = document.getElementById("deleteBtn");
+		var saveBtn = document.getElementById("saveBtn");
+		var editForm = document.getElementById("editForm");
+
+		function openEditModal(record_id, data) {
+			modal.style.display = "block";
+
+			editForm.innerHTML = "";
+			
+			headers = [];
+			document.querySelectorAll('.filter-input').forEach(function(input) {
+				headers.push(input.previousElementSibling.textContent.trim());
+			});
+			var i = 0;
+			for (var key in data) {
+				var div = document.createElement('div');
+				div.classList.add("modal-group");
+				var label = document.createElement("label");
+				label.classList.add("modal-label");
+				label.textContent = headers[i];
+
+				if (key == 'field8'){
+					var textarea = document.createElement('input')
+					textarea.type = 'date';
+					var parts = data[key].split('.');
+					textarea.valueAsDate = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+					//textarea.classList.add('modal-textarea');
+					textarea.style.marginBottom = '10px';
+					textarea.style.outline = 'none';
+					textarea.style.border = 'none';
+					textarea.style['background-color'] = '#111';
+					textarea.style.borderRadius = '10px';
+					textarea.style.width = '20%';
+				} else {
+					var textarea = document.createElement('textarea');
+					textarea.type = 'text';
+					textarea.classList.add('modal-textarea');
+					textarea.value = data[key];
+					textarea.style.marginBottom = '25px';
+					textarea.style.borderRadius = '10px';
+				}
+				textarea.setAttribute('modal-finder', key);
+
+				div.appendChild(label);
+				div.appendChild(textarea);
+
+
+				editForm.appendChild(div);
+				i++;
+			}
+
+			deleteBtn.onclick = function() {
+				var xhr = new XMLHttpRequest();
+				xhr.open("DELETE", window.location.origin + '/api/record/' + record_id, true);
+				xhr.onreadystatechange = function() {
+					if (xhr.readyState === XMLHttpRequest.DONE) {
+						if (xhr.status === 200) {
+							modal.style.display = "none";
+							sendFilters();
+						} else {
+							console.error('Error:', xhr.status);
+						}
+					}
+				};
+				xhr.send();
+			};
+
+			saveBtn.onclick = function() {
+				var updatedData = {};
+				editForm.querySelectorAll("[modal-finder]").forEach(function(input) {
+					var temp_id = input.getAttribute('modal-finder');
+
+					if (temp_id !== 'field8') {
+						updatedData[temp_id] = input.value;
+					} else {
+						updatedData[temp_id] = input.value.split('-').reverse().join('.');
+					}
+				});
+				var xhr = new XMLHttpRequest();
+				xhr.open("PUT", window.location.origin + '/api/record/' + record_id, true);
+				xhr.setRequestHeader("Content-Type", "application/json");
+				xhr.onreadystatechange = function() {
+					if (xhr.readyState === XMLHttpRequest.DONE) {
+						if (xhr.status === 200) {
+							modal.style.display = "none";
+							sendFilters();
+						} else {
+							console.error('Error:', xhr.status);
+						}
+					}
+				};
+				xhr.send(JSON.stringify(updatedData));
+			};
+		}
+	</script>
+</body>
+
+</html>

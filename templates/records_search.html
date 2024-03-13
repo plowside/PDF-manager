@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Records - Search</title>
+	<style>
+		body {
+			background-color: #121212;
+			color: #fff;
+			font-family: Arial, sans-serif;
+			margin: 0;
+			padding: 0;
+		}
+
+		.nav-links {
+			background-color: #333;
+			padding: 10px 0;
+			text-align: center;
+		}
+		.nav-links a {
+			color: #fff;
+			text-decoration: none;
+			margin: 0 10px;
+			padding: 5px 10px;
+			border-radius: 5px;
+			transition: background-color 0.3s ease;
+		}
+		.nav-links a:hover {
+			background-color: #555;
+		}
+		.nav-link {
+			position: absolute;
+			top: 5px;
+			right: 10px;
+			background-color: #222;
+		}
+		.current_url {
+			background-color: #555;
+		}
+
+		.container {
+			max-width: 800px;
+			margin: 0 auto;
+			padding: 20px;
+		}
+
+		.filters {
+			margin-bottom: 20px;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 20px;
+		}
+		.filter-group {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+		}
+		.filter-label {
+			color: #fff;
+			margin-bottom: 5px;
+		}
+		.filter-input {
+			background-color: #333;
+			color: #fff;
+			padding: 8px;
+			border: none;
+			outline: none;
+			margin-bottom: 10px;
+			border-radius: 10px;
+		}
+
+		.date-change {
+			background-color: #282828;
+			color: #fff;
+			padding: 8px 16px;
+			border: none;
+			cursor: pointer;
+			border-radius: 10px;
+			transition: background-color 0.2s;
+		}
+		.date-change:hover {
+			background-color: #303030;
+		}
+		.date-change:active {
+			background-color: #383838;
+		}
+
+		.button-search, .button-comparasion, .button-search-all {
+			background-color: #282828;
+			color: #fff;
+			padding: 8px 16px;
+			border: none;
+			cursor: pointer;
+			border-radius: 10px;
+			transition: background-color 0.2s;
+		}
+		.button-search:hover, .button-search-all:hover, .button-comparasion:hover {
+			background-color: #303030;
+		}
+		.button-search:active, .button-search-all:active, .button-comparasion:active {
+			background-color: #383838;
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			background-color: #333;
+			color: #fff;
+			border-radius: 10px;
+			overflow: auto;
+			max-height: 200px;
+		}
+		tbody {
+			display: block;
+		}
+		thead,
+		tbody tr {
+			display: table;
+			width: 100%;
+			table-layout: fixed;
+		}
+		tbody {
+			overflow-y: auto;
+		}
+		th,
+		td {
+			padding: 10px;
+			border-bottom: 1px solid #444;
+			text-align: center;
+			width: 100%;
+		}
+		th {
+			background-color: #282828;
+		}
+
+		.pdf-button {
+			background-color: #505050;
+			color: #fff;
+			padding: 8px 16px;
+			border: none;
+			cursor: pointer;
+			border-radius: 10px;
+		}
+		.pdf-button:hover {
+			background-color: #606060;
+		}
+
+		::-webkit-scrollbar {
+			width: 7px;
+			background-color: #333;
+			border-radius: 10px;
+		}
+		::-webkit-scrollbar-thumb {
+			-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+			background-color: rgba(219, 219, 219, 0.3);
+			border-radius: 10px;
+		}
+	</style>
+</head>
+<body>
+	<div class="nav-links">
+		<a href="/records/edit">Edit</a>
+		<a href="/records/search" class="current_url">Search</a>
+		<a href="/records/add">Add</a>
+		<a href="/logout" class="nav-link">Logout</a>
+	</div>
+	<div class="container">
+		<div class="filters">
+			<div class="filter-group">
+				<label for="field1" class="filter-label">Thing 1</label>
+				<input type="text" id="field1" class="filter-input">
+			</div>
+			<div class="filter-group">
+				<label for="field2" class="filter-label">Thing 2</label>
+				<input type="text" id="field2" class="filter-input">
+			</div>
+			<div class="filter-group">
+				<label for="field3" class="filter-label">Thing 3</label>
+				<input type="text" id="field3" class="filter-input">
+			</div>
+			<div class="filter-group">
+				<label for="field4" class="filter-label">Thing 4</label>
+				<input type="text" id="field4" class="filter-input">
+			</div>
+			<div class="filter-group">
+				<label for="field5" class="filter-label">Thing 5</label>
+				<input type="text" id="field5" class="filter-input">
+			</div>
+			<div class="filter-group">
+				<label for="field6" class="filter-label">Thing 6</label>
+				<input type="text" id="field6" class="filter-input">
+			</div>
+			<div class="filter-group">
+				<label for="field7" class="filter-label">Thing 7</label>
+				<input type="text" id="field7" class="filter-input">
+			</div>
+			<div class="filter-group">
+				<label for="field8" class="filter-label">Date</label>
+				<input type="date" id="field8" class="filter-input">
+				<button class="date-change" onclick="changeDate()">Disable</button>
+			</div>
+			<button class="button-search" onclick="sendFilters()">Search</button>
+			<button class="button-comparasion" onclick="changeComparasion()" state=true>Full comparasion: Enabled</button>
+			<br><br>
+			<button class="button-search-all" onclick="getAllRecords()" state=true>Get all records</button>
+		</div>
+	</div>
+	<div id="results"></div>
+
+	<script>
+		document.getElementById('field8').valueAsDate = new Date();
+		function changeComparasion() {
+			element = document.querySelector('.button-comparasion');
+			console.log(element.attributes.state);
+
+			if (element.getAttribute('state') == 'true') {
+				element.setAttribute('state', false);
+				element.textContent = 'Full comparasion: Disabled';
+			} else {
+				element.setAttribute('state', true);
+				element.textContent = 'Full comparasion: Enabled';
+			}
+		}
+
+		function changeDate() {
+			element = document.querySelector('.date-change').previousElementSibling;
+			if (element.disabled == true) {
+				element.disabled = false;
+				element.nextElementSibling.textContent = 'Disable';
+			} else {
+				element.disabled = true;
+				element.nextElementSibling.textContent = 'Enable';
+			}
+		}
+
+		function sendFilters() {
+			var filters = { 'fields': {} , 'full_comparasion': document.querySelector('.button-comparasion').getAttribute('state') == 'true'};
+			document.querySelectorAll('.filter-input').forEach(function(input) {
+				if (input.disabled == false) {
+					if (input.id == 'field8'){
+						filters['fields'][input.previousElementSibling.textContent] = input.value.split('-').reverse().join('.');
+					} else {
+						filters['fields'][input.previousElementSibling.textContent] = input.value;
+					}
+				}
+			});
+
+			var xhr = new XMLHttpRequest();
+			xhr.open('POST', window.location.origin + '/api/filter', true);
+			xhr.setRequestHeader('Content-Type', 'application/json');
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState === XMLHttpRequest.DONE) {
+					if (xhr.status === 200) {
+						displayResults(JSON.parse(xhr.responseText));
+					} else {
+						console.error('Error:', xhr.status);
+					}
+				}
+			};
+			xhr.send(JSON.stringify(filters));
+		}
+
+		function getAllRecords() {
+			var xhr = new XMLHttpRequest();
+			xhr.open('POST', window.location.origin + '/api/filter', true);
+			xhr.setRequestHeader('Content-Type', 'application/json');
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState === XMLHttpRequest.DONE) {
+					if (xhr.status === 200) {
+						displayResults(JSON.parse(xhr.responseText));
+					} else {
+						console.error('Error:', xhr.status);
+					}
+				}
+			};
+			xhr.send(JSON.stringify({'all_records': true}));
+		}
+
+		function displayResults(results) {
+			var resultsDiv = document.getElementById('results');
+			resultsDiv.innerHTML = '';
+
+			var table = document.createElement('table')
+			var thead = document.createElement('thead');
+			var tbody = document.createElement('tbody');
+
+			var headerRow = document.createElement('tr');
+			var headers = ["Download"];
+			document.querySelectorAll('.filter-input').forEach(function(input) {
+				headers.push(input.previousElementSibling.textContent.trim());
+			});
+
+			var i = 0;
+			var nig = [];
+			headers.forEach(function(headerText) {
+				var header = document.createElement('th');
+				header.textContent = headerText;
+				//header.classList.add('byplowside');
+				header.attributes.fieldname = 'field'+i;
+				nig.push('field'+i);
+				headerRow.appendChild(header);
+				i++;
+			});
+
+			thead.appendChild(headerRow);
+			table.appendChild(thead);
+
+			results.forEach(function(result) {
+				var row = document.createElement('tr');
+
+				nig.forEach(function(header) {
+					var cell = document.createElement('td');
+
+					if (header == 'field0') {
+						var pdfButton = document.createElement('button');
+						pdfButton.classList.add('pdf-button');
+						pdfButton.textContent = 'Download';
+						if (result['file_url'].startsWith('http') == true){
+							pdfButton.setAttribute("onclick", "window.open('" + result['file_url'] + "', '_blank')");
+						} else {
+							pdfButton.setAttribute("onclick", "window.open('" + window.location.origin + "/" + result['file_url'] + "', '_blank')");
+						}
+						cell.appendChild(pdfButton);
+					} else if (header == 'field8') {
+						cell.textContent = result['field8'];
+					} else {
+						cell.textContent = result[header];
+					}
+					row.appendChild(cell);
+				});
+				tbody.appendChild(row);
+			});
+			table.appendChild(tbody);
+			resultsDiv.appendChild(table);
+
+		}
+	</script>
+</body>
+
+</html>

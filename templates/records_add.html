@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Records - Add</title>
+	<style>
+		body {
+			background-color: #121212;
+			color: #fff;
+			font-family: Arial, sans-serif;
+			margin: 0;
+			padding: 0;
+		}
+
+		.nav-links {
+			background-color: #333;
+			padding: 10px 0;
+			text-align: center;
+		}
+		.nav-links a {
+			color: #fff;
+			text-decoration: none;
+			margin: 0 10px;
+			padding: 5px 10px;
+			border-radius: 5px;
+			transition: background-color 0.3s ease;
+		}
+		.nav-links a:hover {
+			background-color: #555;
+		}
+		.nav-link {
+			position: absolute;
+			top: 5px;
+			right: 10px;
+			background-color: #222;
+		}
+		.current_url {
+			background-color: #555;
+		}
+
+		.container {
+			max-width: 800px;
+			margin: 0 auto;
+			padding: 20px;
+		}
+
+		.filters {
+			margin-bottom: 20px;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 20px;
+		}
+
+		.filter-group {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+		}
+
+		.filter-label {
+			color: #fff;
+			margin-bottom: 5px;
+		}
+
+		.filter-input {
+			background-color: #333;
+			color: #fff;
+			padding: 8px;
+			border: none;
+			outline: none;
+			margin-bottom: 10px;
+			border-radius: 10px;
+		}
+
+		button {
+			background-color: #282828;
+			color: #fff;
+			padding: 8px 16px;
+			border: none;
+			cursor: pointer;
+			border-radius: 10px;
+			transition: background-color 0.2s;
+		}
+		button:hover {
+			background-color: #303030;
+		}
+		button:active {
+			background-color: #383838;
+		}
+
+		.input-file span {
+			outline: none;
+			text-decoration: none;
+			font-size: 14px;
+			vertical-align: middle;
+			color: rgb(255 255 255);
+			text-align: center;
+			border-radius: 8px;
+			background-color: #282828;
+			line-height: 22px;
+			height: 40px;
+			padding: 10px 20px;
+			box-sizing: border-box;
+			border: none;
+			margin: 0;
+			transition: background-color 0.2s;
+		}
+		.input-file input[type=file] {
+			position: absolute;
+			z-index: -1;
+			opacity: 0;
+			display: block;
+			width: 0;
+			height: 0;
+		}
+		.input-file:hover span {
+			background-color: #303030;
+		}
+		.input-file:active span {
+			background-color: #383838;
+		}
+
+
+		::-webkit-scrollbar {
+			width: 7px;
+			background-color: #333;
+			border-radius: 10px;
+		}
+
+		::-webkit-scrollbar-thumb {
+			-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+			background-color: rgba(219, 219, 219, 0.3);
+			border-radius: 10px;
+		}
+	</style>
+</head>
+<body>
+	<div class="nav-links">
+		<a href="/records/edit">Edit</a>
+		<a href="/records/search">Search</a>
+		<a href="/records/add" class="current_url">Add</a>
+		<a href="/logout" class="nav-link">Logout</a>
+	</div>
+	<div class="container">
+		<div class="filters">
+			<div class="filter-group">
+				<label for="filter1" class="filter-label">Thing 1</label>
+				<input type="text" id="filter1" class="filter-input">
+			</div>
+			<div class="filter-group">
+				<label for="filter2" class="filter-label">Thing 2</label>
+				<input type="text" id="filter2" class="filter-input">
+			</div>
+			<div class="filter-group">
+				<label for="filter3" class="filter-label">Thing 3</label>
+				<input type="text" id="filter3" class="filter-input">
+			</div>
+			<div class="filter-group">
+				<label for="filter4" class="filter-label">Thing 4</label>
+				<input type="text" id="filter4" class="filter-input">
+			</div>
+			<div class="filter-group">
+				<label for="filter5" class="filter-label">Thing 5</label>
+				<input type="text" id="filter5" class="filter-input">
+			</div>
+			<div class="filter-group">
+				<label for="filter6" class="filter-label">Thing 6</label>
+				<input type="text" id="filter6" class="filter-input">
+			</div>
+			<div class="filter-group">
+				<label for="filter7" class="filter-label">Thing 7</label>
+				<input type="text" id="filter7" class="filter-input">
+			</div>
+			<div class="filter-group">
+				<label for="filter8" class="filter-label">Date</label>
+				<input type="date" id="filter8" class="filter-input">
+			</div>
+			<div class="filter-group">
+				<label class="input-file">
+					<input type="file" id="file" accept=".pdf">
+					<span>Select PDF file</span>
+				</label>
+			</div>
+			<button onclick="addRecord()">Add</button>
+		</div>
+		<div id="results"></div>
+	</div>
+
+
+
+	<script>
+		document.getElementById('filter8').valueAsDate = new Date();
+		document.querySelector('input[type=file]').addEventListener('change', function() {
+			var file = this.files[0];
+			var label = this.nextElementSibling;
+			if (file) { label.innerHTML = file.name;
+			} else { label.innerHTML = "Select PDF file"; }
+		});
+
+		function addRecord() {
+			var filters = {'fields': {}};
+			document.querySelectorAll('.filter-input').forEach(function(input) {
+				if (input.previousElementSibling.attributes[0].nodeValue !== 'filter8') {
+					filters['fields'][input.previousElementSibling.textContent] = input.value;
+				} else {
+					filters['fields'][input.previousElementSibling.textContent] = input.value.split('-').reverse().join('.');
+				}	
+			});
+			var url = window.location.origin + '/api/add_record';
+			
+			var formData = new FormData();
+			formData.append('record_data', JSON.stringify(filters));
+			formData.append('file', document.getElementById('file').files[0]);
+
+			fetch(url, {
+				method: 'POST',
+				body: formData
+			}).then(response => {
+				return response.json();
+			}).then(data => {
+				console.log(data);
+				try {
+					if ('error' in data) {
+						alert('Error on record creation: '+data['error']);
+					} else {
+						alert('Record created. ID: '+ data['id']);
+					}
+				} catch (err) {
+					alert('Error on record creation: ' + err);
+				}
+			}).catch(error => {
+				alert('Error on record creation: ',error);
+				console.error('Error:', error);
+			});
+		}
+	</script>
+</body>
+</html>
